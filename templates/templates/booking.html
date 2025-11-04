@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Book Flight</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>🎟 Flight Booking</h1>
+  <form id="bookingForm">
+    <input type="text" id="passenger" placeholder="Passenger Name" required>
+    <input type="number" id="seats" placeholder="Seats" value="1" min="1">
+    <button type="submit">Confirm Booking</button>
+  </form>
+
+  <p id="result"></p>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const flight_id = params.get("flight_id");
+
+    document.getElementById('bookingForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name = document.getElementById('passenger').value;
+      const seats = parseInt(document.getElementById('seats').value);
+      const res = await fetch('/api/book', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ flight_id, passenger_name: name, seats })
+      });
+      const data = await res.json();
+      document.getElementById('result').innerText = JSON.stringify(data, null, 2);
+    });
+  </script>
+</body>
+</html>

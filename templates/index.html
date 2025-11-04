@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flight Search</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>✈ Flight Search Portal</h1>
+  <form id="searchForm">
+    <input type="text" id="source" placeholder="Source">
+    <input type="text" id="destination" placeholder="Destination">
+    <button type="submit">Search</button>
+  </form>
+
+  <table id="flightsTable">
+    <thead>
+      <tr><th>Flight No</th><th>Route</th><th>Departure</th><th>Price</th><th>Seats</th><th>Action</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    document.getElementById('searchForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const src = document.getElementById('source').value;
+      const dst = document.getElementById('destination').value;
+      const res = await fetch(`/api/flights?source=${src}&destination=${dst}`);
+      const flights = await res.json();
+      const tbody = document.querySelector('#flightsTable tbody');
+      tbody.innerHTML = '';
+      flights.forEach(f => {
+        tbody.innerHTML += `
+          <tr>
+            <td>${f.flight_number}</td>
+            <td>${f.source} ➜ ${f.destination}</td>
+            <td>${f.departure_time}</td>
+            <td>₹${f.price}</td>
+            <td>${f.available_seats}</td>
+            <td><button onclick="book(${f.id})">Book</button></td>
+          </tr>`;
+      });
+    });
+
+    function book(id){
+      window.location.href = `/booking?flight_id=${id}`;
+    }
+  </script>
+</body>
+</html>

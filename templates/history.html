@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Booking History</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>📜 Booking History</h1>
+  <table id="historyTable">
+    <thead>
+      <tr><th>PNR</th><th>Passenger</th><th>Flight ID</th><th>Seats</th><th>Total</th><th>Status</th><th>Cancel</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function loadHistory(){
+      const res = await fetch('/api/bookings');
+      const bookings = await res.json();
+      const tbody = document.querySelector('#historyTable tbody');
+      tbody.innerHTML = '';
+      bookings.forEach(b=>{
+        tbody.innerHTML += `
+          <tr>
+            <td>${b.pnr}</td>
+            <td>${b.passenger_name}</td>
+            <td>${b.flight_id}</td>
+            <td>${b.seats_booked}</td>
+            <td>₹${b.total_amount}</td>
+            <td>${b.status}</td>
+            <td><button onclick="cancel('${b.pnr}')">Cancel</button></td>
+          </tr>`;
+      });
+    }
+
+    async function cancel(pnr){
+      const res = await fetch(`/api/cancel/${pnr}`, {method:'POST'});
+      const msg = await res.json();
+      alert(msg.message);
+      loadHistory();
+    }
+
+    loadHistory();
+  </script>
+</body>
+</html>
